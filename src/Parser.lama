@@ -64,7 +64,14 @@ var primary  = memo $ eta syntax (
                                                                                        | _    -> Var (x)
                                                                                        esac
                                                                                     }} |
-                                  $(failure ("the rest of primary parsing in not implemented\n"))),
+                    kSkip {Skip} |
+                         kRead v1 = inbr[s("("), lident, s(")")] {Read (v1)} |
+                         kWrite e1 = inbr[s("("), exp, s(")")] {Write (e1)} |
+                         v1 = lident s[":="] e1 = exp {Assn (v1, e1)} |
+                         kIf e = exp kThen s1 = basic s2 = els {If (e, s1, s2)} |
+                         kWhile e1 = exp kDo s1 = basic kOd {While (e1, s1)} |
+                         kDo s = basic kWhile e = exp kOd {DoWhile (s, e)} |
+                         kFor s1 = basic s[","] e = exp s[","] s2 = basic kDo s3 = basic kOd {Seq (s1, While (e, Seq (s3, s2)))}),
     basic    = memo $ eta (expr ({[Right, {[s (":="),
                                             fun (l, loc, r) {
                                               fun (a) {assertValue (a, Assn (l (Ref), r (Val)), loc)}
@@ -77,6 +84,12 @@ var primary  = memo $ eta syntax (
                                  },
                                  primary)),
     exp      = memo $ eta syntax (basic | s1=basic s[";"] s2=exp {fun (a) {Seq (s1 (Void), s2 (a))}});
+
+var els = memo $ eta syntax (
+    -kElse basic -kFi |
+    kElif e=exp kThen s1=basic s2=els {If (e, s1, s2)} |
+    kFi {Skip}
+);
 
 -- Public top-level parser
 public parse = syntax (s=exp {s (Void)});
