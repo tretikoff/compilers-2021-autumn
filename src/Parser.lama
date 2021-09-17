@@ -41,7 +41,7 @@ var simple = memo $ eta syntax (
 --     kElif e1 = exp kThen s1 = stmt s2 = stmt {If (e1, s1, s2)} |
 --     kElse s1 = stmt s1 kFi |
      kWhile e1 = exp kDo s1 = stmt kOd {While (e1, s1)} |
-     kDo s = stmt kWhile e = exp kOd {DoWhile (e, s)} |
+     kDo s = stmt kWhile e = exp kOd {DoWhile (s, e)} |
      kFor s1 = stmt s[","] e = exp s[","] s2 = stmt kDo s3 = stmt kOd {Seq (s1, While (e, Seq (s3, s2)))}
  );
 

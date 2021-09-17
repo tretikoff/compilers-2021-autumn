@@ -33,10 +33,10 @@ fun eval (c, stmt) {
                     else c
                     fi
                         esac
-      | DoWhile (e, s) -> case eval (c, s) of
+      | DoWhile (s, e) -> case eval (c, s) of
          c1 -> case evalExpr (c1[0], e) of
             eres -> if (eres) then
-                        eval (c1, DoWhile (e, s))
+                        eval (c1, DoWhile (s, e))
                               else c1
                     fi
                           esac
